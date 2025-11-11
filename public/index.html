@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generate API Key</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+
+        .key-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: #f1f5f9;
+        }
+
+        .key-box span {
+            overflow-x: auto;
+        }
+
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn {
+            background: #14b8a6;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #0d9488;
+        }
+
+        .fade {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fade.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>API Key Generator</h1>
+        <div class="key-box">
+            <span id="apiKey">Klik “Generate” untuk membuat key</span>
+            <button class="copy-btn" id="copyBtn" disabled>Copy</button>
+        </div>
+        <button id="generateBtn">Generate API Key</button>
+        <p id="toast" class="fade" style="margin-top:15px; font-size:0.9rem; color:#38bdf8;"></p>
+    </div>
+
+    <script>
+        const keyEl = document.getElementById('apiKey');
+        const copyBtn = document.getElementById('copyBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const toast = document.getElementById('toast');
+
+        // Ambil API key dari server Express
+        async function generateApiKey() {
+            try {
+                const response = await fetch('/create', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.apiKey) {
+                    keyEl.textContent = data.apiKey;
+                    copyBtn.disabled = false;
+                    showToast('API key berhasil dibuat dari server');
+                } else {
+                    showToast('Gagal membuat API key');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Terjadi kesalahan saat mengambil API key');
+            }
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(keyEl.textContent).then(() => {
+                showToast('API key disalin ke clipboard');
+            });
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        generateBtn.addEventListener('click', generateApiKey);
+        copyBtn.addEventListener('click', copyToClipboard);
+    </script>
+
+</body>
+
+</html>
